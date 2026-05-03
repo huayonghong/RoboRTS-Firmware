@@ -26,11 +26,19 @@
 #include "chassis.h"
 #include "offline_service.h"
 
+// struct pid_param chassis_motor_param =
+// {
+//     .p = 6.5f,
+//     .i = 0.1f,
+//     .max_out = 15000,
+//     .integral_limit = 500,
+// };
+
 struct pid_param chassis_motor_param =
 {
     .p = 6.5f,
     .i = 0.1f,
-    .max_out = 15000,
+    .max_out = 1500,
     .integral_limit = 500,
 };
 
@@ -64,7 +72,8 @@ void chassis_task(void const *argument)
     rc_device_register(&chassis_rc, "Chassis RC");
     p_rc_info = rc_device_get_info(&chassis_rc);
 
-    chassis_pid_init(&chassis, "Chassis", chassis_motor_param, DEVICE_CAN2);
+    //chassis_pid_init(&chassis, "Chassis", chassis_motor_param, DEVICE_CAN2);
+    chassis_pid_init(&chassis, "Chassis", chassis_motor_param, DEVICE_CAN1);
 
     soft_timer_register((soft_timer_callback)chassis_pid_calculate, (void *)&chassis, 5);
     soft_timer_register((soft_timer_callback)chassis_angle_broadcast, (void *)NULL, 10);

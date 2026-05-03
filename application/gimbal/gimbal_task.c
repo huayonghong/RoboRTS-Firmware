@@ -71,30 +71,42 @@ struct pid_param pitch_inter_param =
 
 struct pid_param yaw_outer_param =
 {
-    .p = 25.0f,
-    .max_out = 2000.0f,
+    // .p = 25.0f,
+    // .max_out = 2000.0f,
+    .p = 8.0f,
+    .max_out = 800.0f,
 };
 
 struct pid_param yaw_inter_param =
 {
-    .p = 100.0f,
-    .i = 0.3f,
-    .max_out = 30000,
-    .integral_limit = 3000,
+    // .p = 100.0f,
+    // .i = 0.3f,
+    // .max_out = 30000,
+    // .integral_limit = 3000,
+    .p = 35.0f,
+    .i = 0.1f,
+    .max_out = 10000,
+    .integral_limit = 1000,
 };
 
 struct pid_param pitch_outer_param =
 {
-    .p = 40.0f,
-    .max_out = 2000,
+    // .p = 40.0f,
+    // .max_out = 2000,
+    .p = 12.0f,
+    .max_out = 800,
 };
 
 struct pid_param pitch_inter_param =
 {
-    .p = 60.0f,
-    .i = 0.1f,
-    .max_out = 30000,
-    .integral_limit = 3000,
+    // .p = 60.0f,
+    // .i = 0.1f,
+    // .max_out = 30000,
+    // .integral_limit = 3000,
+    .p = 20.0f,
+    .i = 0.05f,
+    .max_out = 10000,
+    .integral_limit = 1000,
 };
 
 #endif

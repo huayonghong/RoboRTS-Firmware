@@ -18,8 +18,8 @@
 #ifndef __INIT_H__
 #define __INIT_H__
 
-#define CHASSIS_APP 1
-#define GIMBAL_APP  0
+#define CHASSIS_APP 0
+#define GIMBAL_APP  1
 
 #include "os_timer.h"
 

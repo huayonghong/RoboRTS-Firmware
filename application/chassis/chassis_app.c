@@ -26,6 +26,7 @@
 osThreadId chassis_task_t;
 
 static void chassis_can2_callback(uint16_t std_id, uint8_t *data, uint8_t dlc);
+static void chassis_can1_callback(uint16_t std_id, uint8_t *data, uint8_t dlc);
 static void chassis_user_key_handle(void);
 static void chassis_offline(void);
 static void chassis_online(void);
@@ -89,10 +90,10 @@ void chassis_app_init(void)
     struct app_manage *app;
     chassis_t p_chassis;
 
-    protocol_can_interface_register("can1_0x500_to_0x600", 1024, 1, CAN1_PORT, GIMBAL_CAN_ID, CHASSIS_CAN_ID, can1_std_transmit);
-
     app = get_current_app();
     p_chassis = get_chassis();
+
+    protocol_can_interface_register("can1_0x500_to_0x600", 1024, 1, CAN1_PORT, GIMBAL_CAN_ID, CHASSIS_CAN_ID, can1_std_transmit);
 
     app->local_addr = CHASSIS_ADDRESS;
     app->recv_cmd_table = chassis_recv_cmd_table;
@@ -106,7 +107,9 @@ void chassis_app_init(void)
     app->route_table = chassis_route_table;
     app->route_tab_size = sizeof(chassis_route_table) / sizeof(struct route_obj);
 
-    app->can2_msg_callback = chassis_can2_callback;
+    //app->can2_msg_callback = chassis_can2_callback;
+    app->can1_msg_callback = chassis_can1_callback;
+
     app->dbus_rx_complete = chassis_dbus_rx_complete;
 
     app->user_input_callback = chassis_input_handle;
@@ -118,6 +121,25 @@ void chassis_app_init(void)
 
     osThreadDef(CHASSIS_TASK, chassis_task, osPriorityNormal, 0, 512);
     chassis_task_t = osThreadCreate(osThread(CHASSIS_TASK), NULL);
+}
+
+void chassis_can1_callback(uint16_t std_id, uint8_t *data, uint8_t dlc)
+{
+    switch (std_id)
+    {
+    case 0x201:
+        offline_event_time_update(OFFLINE_CHASSIS_MOTOR1);
+        break;
+    case 0x202:
+        offline_event_time_update(OFFLINE_CHASSIS_MOTOR2);
+        break;
+    case 0x203:
+        offline_event_time_update(OFFLINE_CHASSIS_MOTOR3);
+        break;
+    case 0x204:
+        offline_event_time_update(OFFLINE_CHASSIS_MOTOR4);
+        break;
+    }
 }
 
 /**

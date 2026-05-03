@@ -7,8 +7,8 @@
 #define LOG_OUTPUT_MAX_LEN  128
 
 #define LOG_TIMESTAMP_EN     1
-#define LOG_FUNCTION_EN      0
-#define LOG_FILE_LINE_EN     0
+#define LOG_FUNCTION_EN      1
+#define LOG_FILE_LINE_EN     1
 
 #define LOG_ASSERT_EN        1
 #define LOG_ERROR_EN         1

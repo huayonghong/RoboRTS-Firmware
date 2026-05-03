@@ -18,6 +18,7 @@
 
 #include "cmsis_os.h"
 #include "drv_io.h"
+#include "appcfg.h"
 #include "offline_service.h"
 
 static void offline_service(void const *argument);
@@ -32,6 +33,10 @@ void offline_service_task_init(void)
     for (int i = 1; i < OFFLINE_EVENT_MAX_NUM; i++)
     {
         offline_manage[i].online_state = STATE_OFFLINE;
+#if defined(DISABLE_OFFLINE_GIMBAL_TURN_MOTOR)
+        if(i == OFFLINE_GIMBAL_TURN_MOTOR)
+            offline_manage[i].online_state = STATE_ONLINE;
+#endif
     }
 
     osThreadDef(OFFLINE_TASK, offline_service, osPriorityNormal, 0, 512);
@@ -58,6 +63,10 @@ void offline_service(void const *argument)
 
         for (int i = 1; i < OFFLINE_EVENT_MAX_NUM; i++)
         {
+#if defined(DISABLE_OFFLINE_GIMBAL_TURN_MOTOR)
+            if(i == OFFLINE_GIMBAL_TURN_MOTOR)
+                continue;
+#endif
             if ((time_now - offline_manage[i].last_time > offline_manage[i].offline_time) && (offline_manage[i].enable))
             {
                 offline_manage[i].online_state = STATE_OFFLINE;
