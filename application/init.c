@@ -90,8 +90,6 @@ void services_task(void const *argument)
     hw_init();
     sys_task();
     task_init();
-	
-    //usart6_transmit("hello robot\n", 13);
 
     log_printf("\r\nRoboMaster>");
     /* USER CODE BEGIN services_task */
