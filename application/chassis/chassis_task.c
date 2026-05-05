@@ -38,7 +38,7 @@ struct pid_param chassis_motor_param =
 {
     .p = 6.5f,
     .i = 0.1f,
-    .max_out = 1500,
+    .max_out = 2500, //15000
     .integral_limit = 500,
 };
 
