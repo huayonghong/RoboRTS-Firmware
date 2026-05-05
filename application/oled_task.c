@@ -22,7 +22,7 @@
 #define OLED_BATTERY_GRAPHIC_W 24U
 #define OLED_BAT_PCT_X         3U
 #define OLED_BAT_PCT_Y         4U
-#define OLED_BAT_VBAT_X        (OLED_BATTERY_GRAPHIC_W + 2U)
+#define OLED_BAT_VBAT_X        (OLED_BATTERY_GRAPHIC_W + 8U)
 #define OLED_BAT_VBAT_Y        OLED_BAT_PCT_Y
 
 static uint8_t refresh_div;
