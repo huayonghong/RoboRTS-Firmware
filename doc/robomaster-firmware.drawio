@@ -1,0 +1,482 @@
+<mxfile host="65bd71144e" pages="6">
+    <diagram id="placeholder-page" name="占位页（原图可合并至此）">
+        <mxGraphModel dx="1090" dy="776" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="P1-1" parent="0"/>
+                <mxCell id="P1-note" value="若你已有 drawio 文档：在 diagrams.net 中打开该文件，使用「添加页面」或将此页的 mxGraphModel 复制到你的文件中即可。&#10;&#10;本仓库原先未检出其它 .drawio 文件。" style="text;html=1;strokeColor=none;fillColor=#FFF4CC;align=left;verticalAlign=top;spacingLeft=12;spacingTop=12;fontSize=14;rounded=1;" parent="P1-1" vertex="1">
+                    <mxGeometry x="80" y="80" width="520" height="120" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="init-and-modes" name="系统初始化 · 云台底盘模式 · 跨板信号">
+        <mxGraphModel dx="1090" dy="776" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="2200" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="RoboRTS-Firmware：初始化流程 · APP 选择 · 云台板→底盘驱动信号" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;fontSize=18;spacingTop=6;spacingBottom=6;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="30" width="1440" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="lane-boot" value="1. 复位入口（FreeRTOS）" style="swimlane;horizontal=0;startSize=32;fontSize=13;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="100" width="1480" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="boot1" value="services_task()&#10;&#10;· MX_USB_DEVICE_Init&#10;· SEGGER_SYSVIEW_Conf" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;fontSize=12;spacingTop=6;spacingBottom=6;" parent="lane-boot" vertex="1">
+                    <mxGeometry x="40" y="55" width="260" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="boot2" value="hw_init()&#10;&#10;board_config()&#10;· 日志 USART / CAN / PWM / BMI088&#10;· protocol、SoftTimer、电机 CAN 1ms、DBus&#10;&#10;system_config()&#10;· 读 GPIO → 决定 APP 类型&#10;&#10;easyflash_init()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;fontSize=12;spacingTop=6;spacingBottom=6;align=left;spacingLeft=10;" parent="lane-boot" vertex="1">
+                    <mxGeometry x="340" y="45" width="420" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="boot3" value="sys_task()&#10;&#10;· thread_cli_init&#10;· offline_service_task_init&#10;· soft_timer_FreeRTOS_init&#10;· sensor_task_init" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;fontSize=12;spacingTop=6;spacingBottom=6;align=left;spacingLeft=10;" parent="lane-boot" vertex="1">
+                    <mxGeometry x="800" y="55" width="300" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="boot4" value="task_init()&#10;&#10;· 按 get_sys_cfg() 选择&#10;  chassis_app_init() 或&#10;  gimbal_app_init()&#10;&#10;· app_protocol_init()&#10;· communicate_task_init()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;fontSize=12;spacingTop=6;spacingBottom=6;align=left;spacingLeft=10;" parent="lane-boot" vertex="1">
+                    <mxGeometry x="1140" y="50" width="300" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="lane-boot" source="boot1" target="boot2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="lane-boot" source="boot2" target="boot3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="lane-boot" source="boot3" target="boot4" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="lane-select" value="2. 云台板 / 底盘板 — 如何选择（编译常量 + 硬件引脚）" style="swimlane;horizontal=0;startSize=32;fontSize=13;fillColor=#FFE6CC;strokeColor=#D79B00;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="340" width="1480" height="520" as="geometry"/>
+                </mxCell>
+                <mxCell id="sel1" value="init.h&#10;&#10;CHASSIS_APP = 1&#10;GIMBAL_APP  = 0" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;spacingTop=8;" parent="lane-select" vertex="1">
+                    <mxGeometry x="40" y="55" width="200" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="sel2" value="system_config()&#10;&#10;glb_sys_cfg =&#10;HAL_GPIO_ReadPin(&#10;  APP_CONFIG_GPIO_Port,&#10;  APP_CONFIG_Pin)&#10;&#10;CubeMX：PB13 → APP_CONFIG" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;fontSize=12;spacingTop=6;align=left;spacingLeft=12;" parent="lane-select" vertex="1">
+                    <mxGeometry x="280" y="50" width="280" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="sel3" value="task_init() 分支&#10;&#10;if (get_sys_cfg()&#10;    == CHASSIS_APP)&#10;    chassis_app_init();&#10;else&#10;    gimbal_app_init();" style="rhombus;whiteSpace=wrap;html=1;fillColor=#F8CECC;fontSize=12;spacingTop=4;" parent="lane-select" vertex="1">
+                    <mxGeometry x="620" y="55" width="280" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="sel4" value="底盘固件分支 — chassis_app_init()&#10;&#10;· local_addr = CHASSIS_ADDRESS&#10;· CAN1 协议隧道（与云台通信）&#10;    Gimbal ↔ Chassis，StdId 0x500 ↔ 0x600&#10;· protocol_can_interface_register(...)&#10;· 注册 chassis 指令表、离线表、路由&#10;· osThreadCreate：chassis_task&#10;· SoftTimer：chassis_info_push 10ms" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="lane-select" vertex="1">
+                    <mxGeometry x="80" y="270" width="620" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="sel5" value="云台固件分支 — gimbal_app_init()&#10;&#10;· local_addr = GIMBAL_ADDRESS&#10;· CAN1：本板发送 0x600 → 对端 0x500&#10;· 注册 gimbal/shoot 接收指令表&#10;· can1/can2 回调、DBus 完成回调&#10;· osThreadCreate：gimbal_task、shoot_task&#10;· SoftTimer：gimbal_info_push 10ms" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="lane-select" vertex="1">
+                    <mxGeometry x="780" y="270" width="620" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="es1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="lane-select" source="sel1" target="sel2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="es2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="lane-select" source="sel2" target="sel3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="es3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="lane-select" source="sel3" target="sel4" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="lbl-chassis" value="GPIO 读值为 CHASSIS_APP (1)" style="edgeLabel;html=1;align=center;fontSize=11;fontStyle=1;" parent="es3" vertex="1" connectable="0">
+                    <mxGeometry x="-0.1" y="1" relative="1" as="geometry">
+                        <mxPoint x="-40" y="-8" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="es4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="lane-select" source="sel3" target="sel5" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="760" y="230"/>
+                            <mxPoint x="1090" y="230"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="lbl-gimbal" value="否则 → 云台 APP (0)" style="edgeLabel;html=1;align=center;fontSize=11;fontStyle=1;" parent="es4" vertex="1" connectable="0">
+                    <mxGeometry x="-0.2" y="2" relative="1" as="geometry">
+                        <mxPoint x="30" y="-12" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="lane-init-sub" value="3. 运行时「模式」—— 与 APP 选择不同（遥控器 / SDK）" style="swimlane;horizontal=0;startSize=32;fontSize=13;fillColor=#E6E6E6;strokeColor=#666666;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="900" width="1480" height="520" as="geometry"/>
+                </mxCell>
+                <mxCell id="sub-g" value="云台 — gimbal_task / gimbal_mode&#10;&#10;【上电逻辑】&#10;· EasyFlash 无 GIMBAL_PARAM_KEY → ADJUST_MODE（机械咬合法标定）&#10;· 已有参数 → set_offset + gimbal_init_start() → INIT_MODE&#10;· INIT_MODE：pitch/yaw ramp 回中 → 误差足够小 → NORMAL_MODE&#10;&#10;【NORMAL_MODE 下遥控器 S2】（gimbal_normol_handle）&#10;· S2 UP：Yaw 陀螺模式 GYRO_MODE，ch3/ch4 增量&#10;· S2 MID：Yaw 编码器 ENCODER_MODE&#10;· S2 DOWN：上位机 SDK（set_gimbal_sdk_mode、Manifold 心跳与控制类离线事件）" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=16;spacingTop=12;fillColor=#DAE8FC;fontSize=12;verticalAlign=top;" parent="lane-init-sub" vertex="1">
+                    <mxGeometry x="40" y="55" width="1380" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="sub-c" value="底盘 — chassis_task（运行在底盘 MCU 固件上）&#10;&#10;【遥控器 S2】&#10;· S2 UP：随动 — wz = PID(follow_relative_angle)，vx/vy 来自摇杆&#10;· S2 MID：全手动 — wz 来自 ch3&#10;· S2 DOWN：set_chassis_sdk_mode ON — 上位机 CMD_SET_CHASSIS_SPEED / CMD_SET_CHASSIS_SPD_ACC 等经 protocol 下发&#10;&#10;【follow_relative_angle】&#10;· follow_angle_info_rcv() 解析 CMD_PUSH_GIMBAL_INFO（云台周期推送）&#10;· 与云台「广播 + CAN1」链路配合，用于机身对准云台 yaw" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=16;spacingTop=12;fillColor=#D5E8D4;fontSize=12;verticalAlign=top;" parent="lane-init-sub" vertex="1">
+                    <mxGeometry x="40" y="290" width="1380" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="lane-can" value="4. 云台板固件 — 如何把信号送到「底盘电机驱动器」（跨 MCU）" style="swimlane;horizontal=0;startSize=32;fontSize=13;fillColor=#F5F5F5;strokeColor=#333333;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="1460" width="1480" height="560" as="geometry"/>
+                </mxCell>
+                <mxCell id="can-a" value="云台 MCU&#10;（烧录 gimbal_app）&#10;&#10;· 云台 / 摩擦轮：CAN2&#10;  motor_can_output 1ms&#10;· 定时：gimbal_info_push 10ms" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;fontSize=12;spacingTop=8;verticalAlign=top;align=left;spacingLeft=12;" parent="lane-can" vertex="1">
+                    <mxGeometry x="40" y="55" width="280" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="can-b" value="protocol_send(&#10;  BROADCAST,&#10;  CMD_PUSH_GIMBAL_INFO, ...)&#10;&#10;广播队列 flush →&#10;CAN1 封装发送&#10;（跨板隧道 0x600 / 0x500）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;fontSize=12;spacingTop=8;verticalAlign=top;align=left;spacingLeft=12;" parent="lane-can" vertex="1">
+                    <mxGeometry x="360" y="55" width="320" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="can-c" value="底盘 MCU CAN1 收包&#10;&#10;protocol 解包&#10;CMD_PUSH_GIMBAL_INFO&#10;→ follow_angle_info_rcv()&#10;→ follow_relative_angle 更新" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;fontSize=12;spacingTop=8;verticalAlign=top;align=left;spacingLeft=12;" parent="lane-can" vertex="1">
+                    <mxGeometry x="720" y="55" width="340" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="can-d" value="chassis_task&#10;（S2 UP 随动）&#10;&#10;chassis_set_speed&#10;→ chassis_pid_calculate&#10;→ 四轮电流设定&#10;&#10;CAN2 motor&#10;→ 底盘电调" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;fontSize=12;spacingTop=8;verticalAlign=top;align=left;spacingLeft=12;" parent="lane-can" vertex="1">
+                    <mxGeometry x="1100" y="55" width="320" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="can-e" value="反向链路（底盘 → 云台融合）&#10;&#10;chassis_angle_broadcast()：can1_std_transmit(0x401, yaw, yaw_rate)&#10;云台 can1 回调 → gimbal_gyro_yaw_update() → 与单轴陀螺融合" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="lane-can" vertex="1">
+                    <mxGeometry x="40" y="240" width="1380" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="can-f" value="补充：上位机「直接」下发底盘速度指令&#10;&#10;· 由底盘固件 chassis_recv_cmd_table 解析 CMD_SET_CHASSIS_SPEED / CMD_SET_CHASSIS_SPD_ACC&#10;· 典型接线：USB 接底盘板 → 路由 MANIFOLD2 → usb（见 chassis_route_table）&#10;· 若上位机 USB 仅接云台板：单播到 CHASSIS_ADDRESS 需在协议路由中指向 CAN 转发；当前 gimbal_route_table 仅显式绑定 GIMBAL_ADDRESS 与 MANIFOLD2_ADDRESS，可按部署补全。" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=14;spacingTop=10;fillColor=#F8CECC;fontSize=12;verticalAlign=top;fontStyle=2;" parent="lane-can" vertex="1">
+                    <mxGeometry x="40" y="370" width="1380" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="ea1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="lane-can" source="can-a" target="can-b" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ea2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="lane-can" source="can-b" target="can-c" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ea3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeWidth=2;" parent="lane-can" source="can-c" target="can-d" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="lbl-follow" value="随动控制链" style="edgeLabel;html=1;fontSize=11;fontStyle=1" parent="ea3" vertex="1" connectable="0">
+                    <mxGeometry x="-0.15" relative="1" as="geometry">
+                        <mxPoint y="-14" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="footer" value="代码参考：application/init.c · init.h · chassis_app.c · gimbal_app.c · chassis_task.c · gimbal_task.c · gimbal_cmd.c（gimbal_info_push）· board.c（hw）" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontColor=#666666;spacingTop=8;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="2050" width="1400" height="50" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="chassis-follow-gimbal" name="底盘随动模式下云台运动与程序处理">
+        <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="2100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="cfm-title" value="底盘「随动」模式开启后：云台如何动、程序如何处理&#10;（随动 = chassis_task 中遥控器三挡开关 S2 = UP；与云台板固件并行运行）" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;fontSize=17;spacingTop=8;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="25" width="1480" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-note" value="概念区分&#10;&#10;· 底盘随动：车体用 yaw 角速度 wz 跟踪云台编码器 yaw（follow_relative_angle），代码在「底盘 MCU」的 chassis_task。&#10;· 云台侧 RC_S2_UP：注释为 follow mode，实为云台 Yaw 陀螺模式 + 摇杆增量，代码在「云台 MCU」的 gimbal_normol_handle；与底盘是否随动无直接调用关系。&#10;· 云台电机电流始终由云台板 gimbal_cascade_calculate → CAN2 下发，底盘任务不会直接驱动云台电机。" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=16;spacingTop=12;fillColor=#FFF4CC;fontSize=12;strokeColor=#D6B656;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="105" width="1480" height="140" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cfm-lane-g" value="云台 MCU — 云台如何运动（底盘随动与否均可运行）" style="swimlane;horizontal=0;startSize=34;fontSize=13;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="270" width="1480" height="380" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-g1" value="周期：osDelayUntil 5ms（GIMBAL_PERIOD）" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#E1D5E7;" parent="cfm-lane-g" vertex="1">
+                    <mxGeometry x="40" y="55" width="280" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-g2" value="DBUS_MSG → gimbal_dr16_data_update&#10;→ rc_device_date_update（gimbal_rc）" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#F5F5F5;align=left;spacingLeft=12;" parent="cfm-lane-g" vertex="1">
+                    <mxGeometry x="350" y="50" width="360" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-g3" value="AHRS_MSG → 陀螺姿态&#10;→ gimbal_pitch_gyro_update&#10;→ gimbal_rate_update" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#F5F5F5;align=left;spacingLeft=12;" parent="cfm-lane-g" vertex="1">
+                    <mxGeometry x="740" y="50" width="340" height="85" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-g4" value="switch(gimbal_mode)&#10;NORMAL_MODE：&#10;  gimbal_normol_handle（按云台 RC S2）&#10;  · S2 UP：Yaw=GYRO_MODE，ch3/ch4→pitch/yaw delta&#10;  · S2 MID：Yaw=ENCODER_MODE&#10;  · S2 DOWN：SDK / 离线策略&#10;  gimbal_cascade_calculate → 云台 PID&#10;INIT / ADJUST：回中或标定分支" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;align=left;spacingLeft=14;spacingTop=10;fillColor=#FFFFFF;verticalAlign=top;" parent="cfm-lane-g" vertex="1">
+                    <mxGeometry x="40" y="155" width="680" height="195" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-g5" value="底盘来的 yaw 辅助（可选）&#10;&#10;CAN1 收 0x401&#10;→ gimbal_can1_callback&#10;→ gimbal_gyro_yaw_update&#10;→ single_gyro + gimbal_yaw_gyro_update&#10;（与车体坐标系 yaw 对齐/融合）" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;align=left;spacingLeft=14;spacingTop=10;fillColor=#E1D5E7;verticalAlign=top;" parent="cfm-lane-g" vertex="1">
+                    <mxGeometry x="760" y="155" width="400" height="195" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-g6" value="输出&#10;&#10;motor_set_current（yaw/pitch/拨弹）&#10;→ 1ms motor_can_output(CAN2)&#10;云台物理运动" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;align=left;spacingLeft=12;fillColor=#D5E8D4;verticalAlign=top;" parent="cfm-lane-g" vertex="1">
+                    <mxGeometry x="1190" y="155" width="250" height="195" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-eg1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="cfm-lane-g" source="cfm-g1" target="cfm-g2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-eg2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="cfm-lane-g" source="cfm-g2" target="cfm-g4" edge="1">
+                    <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="530" y="140"/><mxPoint x="380" y="140"/></Array></mxGeometry>
+                </mxCell>
+                <mxCell id="cfm-eg3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;dashed=1;" parent="cfm-lane-g" source="cfm-g3" target="cfm-g4" edge="1">
+                    <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="910" y="140"/><mxPoint x="380" y="140"/></Array></mxGeometry>
+                </mxCell>
+                <mxCell id="cfm-eg4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="cfm-lane-g" source="cfm-g4" target="cfm-g6" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cfm-lane-c" value="底盘 MCU — 随动模式开启后程序如何处理（车体跟踪云台朝向）" style="swimlane;horizontal=0;startSize=34;fontSize=13;fillColor=#D5E8D4;strokeColor=#82B366;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="680" width="1480" height="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-c1" value="周期：osDelay 5ms" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;" parent="cfm-lane-c" vertex="1">
+                    <mxGeometry x="40" y="55" width="200" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-c2" value="DBUS → chassis_dr16_data_update&#10;→ chassis_rc 状态机（S2 档位）" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;align=left;spacingLeft=12;" parent="cfm-lane-c" vertex="1">
+                    <mxGeometry x="270" y="48" width="320" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-c3" value="当 chassis_rc：RC_S2_UP&#10;&#10;vx = ch2 映射 MAX_CHASSIS_VX&#10;vy = -ch1 映射 MAX_CHASSIS_VY&#10;wz = -pid_calculate(&amp;pid_follow,&#10;      follow_relative_angle, 0)&#10;&#10;chassis_set_offset(ROTATE_X/Y)&#10;chassis_set_speed(vx, vy, wz)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;align=left;spacingLeft=14;spacingTop=10;fillColor=#FFF2CC;verticalAlign=top;" parent="cfm-lane-c" vertex="1">
+                    <mxGeometry x="40" y="145" width="420" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-c4" value="follow_relative_angle 来源&#10;&#10;协议 CMD_PUSH_GIMBAL_INFO&#10;→ follow_angle_info_rcv()&#10;follow_relative_angle =&#10;  info-&gt;yaw_ecd_angle / 10.0f&#10;&#10;（云台板 gimbal_info_push 广播经 CAN1）" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cfm-lane-c" vertex="1">
+                    <mxGeometry x="500" y="145" width="420" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-c5" value="SoftTimer 5ms&#10;chassis_pid_calculate&#10;→ 麦克纳姆解算 + motor 电流&#10;&#10;SoftTimer 10ms&#10;chassis_angle_broadcast&#10;→ CAN1 0x401 发车体 yaw / yaw_rate&#10;供云台融合" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;align=left;spacingLeft=12;verticalAlign=top;" parent="cfm-lane-c" vertex="1">
+                    <mxGeometry x="960" y="145" width="480" height="240" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cfm-lane-loop" value="闭合关系（底盘随动时）" style="swimlane;horizontal=0;startSize=32;fontSize=13;fillColor=#F5F5F5;strokeColor=#666666;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="1130" width="1480" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfm-loop-txt" value="1）云台转动 → 编码器/yaw 变化 → gimbal_info_push（约 10ms）推送 CMD_PUSH_GIMBAL_INFO → 底盘更新 follow_relative_angle。&#10;&#10;2）底盘 PID 把相对角误差转成 wz → 车体转向，使机身 yaw 跟上云台指向（平移 vx、vy 仍由底盘摇杆 ch1/ch2）。&#10;&#10;3）底盘 chassis_angle_broadcast（10ms）把车体 yaw、yaw_rate 发到 CAN 0x401 → 云台 gimbal_gyro_yaw_update，参与云台 yaw 陀螺支路。&#10;&#10;结论：开启底盘随动并不会「接管」云台；云台运动仍由云台任务与遥控器/SDK 决定，底盘仅根据推送角做车体旋转闭环。" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=18;spacingTop=14;fontSize=12;verticalAlign=top;" parent="cfm-lane-loop" vertex="1">
+                    <mxGeometry x="40" y="50" width="1400" height="210" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cfm-footer" value="代码：chassis_task.c（RC_S2_UP、pid_follow、follow_angle_info_rcv）· gimbal_task.c（gimbal_normol_handle、switch gimbal_mode）· gimbal_app.c（can1 回调）· gimbal_cmd.c（gimbal_info_push）" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="2030" width="1460" height="40" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="calibration-flow" name="标定流程 · 存储 · 默认值">
+        <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="2400" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+
+                <mxCell id="cal-title" value="RoboRTS-Firmware：底盘 / 云台标定方法 · 流程 · 存储方式 · 默认值" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;fontSize=18;spacingTop=8;spacingBottom=8;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="20" width="1680" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="cal-summary" value="项目实际只有两类持久化标定：① 云台编码器零位（GIMBAL_PARAM_KEY=&quot;ECD_CENTER&quot;，仅 4 字节）②BMI088 陀螺仪零偏（BMI088_PARAM_KEY=&quot;BMI088_PARAM&quot;，12 字节 fp32×3）。&#10;底盘没有专用持久化标定流程：电机编码器初值由 motor.c 在前 50 帧 CAN 中自动取一次作为 offset_ecd（每次上电），其它几何/电机参数（轮距、轴距、偏置、减速比等）全部为编译期宏。&#10;两个 KEY 均通过 EasyFlash 存放在 STM32F4 内部 Flash 的备份区（EF_START_ADDR = FLASH_BASE + 768KB，ENV_AREA_SIZE = 256KB），写入后立即 NVIC_SystemReset 触发重新加载。" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=18;spacingTop=12;fillColor=#FFF4CC;strokeColor=#D6B656;fontSize=12;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="90" width="1680" height="160" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-lane-store" value="① 存储层 — EasyFlash NG 模式（STM32F4 片内 Flash）" style="swimlane;horizontal=0;startSize=34;fontSize=13;fillColor=#E1D5E7;strokeColor=#9673A6;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="270" width="1680" height="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="cal-store-cfg" value="components/easyflash/inc/ef_cfg.h&#10;&#10;EF_USING_ENV&#10;EF_ERASE_MIN_SIZE = 128 KB&#10;EF_WRITE_GRAN     = 8 bit&#10;EF_START_ADDR     = FLASH_BASE + (512+256) KB&#10;                  = 0x080C0000（Sector 9 起）&#10;ENV_AREA_SIZE     = 2 × 128 KB = 256 KB&#10;LOG_AREA_SIZE     = 未启用" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-store" vertex="1">
+                    <mxGeometry x="40" y="55" width="380" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="cal-store-map" value="Flash 备份区映射（STM32F407IG）&#10;&#10;┌───────────────────────────────┐&#10;│ 0x0800_0000  应用程序代码区    │&#10;├───────────────────────────────┤&#10;│ 0x080C_0000  ENV_AREA  (256K) │ ← Sector 9 + 10&#10;│   key=&quot;boot_times&quot;            │&#10;│   key=&quot;ECD_CENTER&quot;            │&#10;│   key=&quot;BMI088_PARAM&quot;          │&#10;├───────────────────────────────┤&#10;│  …  其余扇区                  │&#10;└───────────────────────────────┘" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;fontFamily=Courier New;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-store" vertex="1">
+                    <mxGeometry x="450" y="55" width="500" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="cal-store-api" value="读 / 写 / 删 API（components/easyflash/src/ef_env.c）&#10;&#10;ef_get_env_blob(key, &amp;buf, len, &amp;saved_len)&#10;ef_set_env_blob(key, &amp;buf, len)&#10;ef_del_env(key)&#10;&#10;并发：&#10;ef_port_env_lock / unlock 关 / 开 IRQ&#10;&#10;默认 ENV（ef_port.c）：&#10;  static ef_env default_env_set[] = { {&quot;boot_times&quot;, &quot;0&quot;} };" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-store" vertex="1">
+                    <mxGeometry x="980" y="55" width="660" height="220" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-lane-imu" value="② BMI088 陀螺仪零偏标定（绑定温度 40°C） — 由 sensor_task / drv_bmi088.c 实现" style="swimlane;horizontal=0;startSize=34;fontSize=13;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="610" width="1680" height="500" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-imu-trig" value="触发条件&#10;&#10;sensor_task → bmi088_get_offset()&#10;&#10;读 BMI088_PARAM_KEY：&#10;  read_len == sizeof(gyro_offset)?&#10;  · 是 → 直接使用持久化值&#10;  · 否 → 调用 bmi088_set_offset()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-imu" vertex="1">
+                    <mxGeometry x="40" y="55" width="360" height="190" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-imu-temp" value="阶段 1 — 等待恒温&#10;&#10;imu_temp_ctrl_init()  开启 PID 加热&#10;DEFAULT_IMU_TEMP = 40.0f °C&#10;while ( |40 - temp| &gt; 1.0 ) {&#10;   BMI088_Read; imu_temp_keep;&#10;   HAL_Delay(2);&#10;   LED_R/B/G 全亮 (校准指示)&#10;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-imu" vertex="1">
+                    <mxGeometry x="430" y="55" width="380" height="190" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-imu-avg" value="阶段 2 — 静止采样取均值&#10;&#10;for (i=0; i&lt;300; i++) {&#10;   BMI088_Read(gyro, accel, &amp;temperate);&#10;   gyro_offset[0..2] += gyro[0..2];&#10;   imu_temp_keep; HAL_Delay(2);&#10;}&#10;gyro_offset[i] /= 300;&#10;&#10;采样总耗时 ≈ 600 ms（机器须保持完全静止）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-imu" vertex="1">
+                    <mxGeometry x="840" y="55" width="380" height="190" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-imu-save" value="阶段 3 — 持久化 + 复位&#10;&#10;ef_set_env_blob(&#10;  BMI088_PARAM_KEY,  // &quot;BMI088_PARAM&quot;&#10;  gyro_offset, sizeof(gyro_offset));&#10;__disable_irq();&#10;NVIC_SystemReset();&#10;&#10;复位后 sensor_task 重新执行&#10;bmi088_get_offset() 即命中 EasyFlash" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-imu" vertex="1">
+                    <mxGeometry x="1250" y="55" width="390" height="190" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-imu-data" value="数据结构与运行时使用（drv_bmi088.c）&#10;&#10;fp32 gyro_offset[3];           // 仅陀螺零偏被持久化&#10;fp32 accel_offset[3] = {0};    // 加速度计零偏：未做标定，恒为 0&#10;&#10;bmi088_cali_slove(): gyro[i] = Σ R[i][j]*raw_gyro[j] - gyro_offset[i];&#10;BMI088_BOARD_INSTALL_SPIN_MATRIX = {{0,1,0},{-1,0,0},{0,0,1}}  // 板载安装姿态" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F0F0;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-imu" vertex="1">
+                    <mxGeometry x="40" y="265" width="780" height="180" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-imu-trig2" value="重新标定的方式&#10;&#10;1) 上电后 EasyFlash 中没有 BMI088_PARAM_KEY（首次 / 清空后）&#10;2) chassis_user_key_handle / gimbal_user_key_handle：&#10;     按板载 USER 键（GPIO PIN_0 EXTI）&#10;     → ef_del_env(BMI088_PARAM_KEY) → 复位 → 再校&#10;3) 上位机指令 CMD_GIMBAL_ADJUST (0x0403)&#10;     gimbal_adjust_cmd → gimbal_user_key_handle&#10;     （注意：会同时删除 GIMBAL_PARAM_KEY）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F0F0;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-imu" vertex="1">
+                    <mxGeometry x="840" y="265" width="800" height="180" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-imu-e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="cal-lane-imu" source="cal-imu-trig" target="cal-imu-temp" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+                <mxCell id="cal-imu-e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="cal-lane-imu" source="cal-imu-temp" target="cal-imu-avg" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+                <mxCell id="cal-imu-e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="cal-lane-imu" source="cal-imu-avg" target="cal-imu-save" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+                <mxCell id="cal-lane-gim" value="③ 云台编码器中心（YAW/PITCH ECD CENTER）— 机械咬合法 — 由 gimbal_task / gimbal_center_adjust 实现" style="swimlane;horizontal=0;startSize=34;fontSize=13;fillColor=#D5E8D4;strokeColor=#82B366;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="1130" width="1680" height="600" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-gim-trig" value="触发条件 / 入口（gimbal_task）&#10;&#10;ef_get_env_blob(GIMBAL_PARAM_KEY, &amp;center_param, ...);&#10;&#10;若 read_len ≠ sizeof(center_param)：&#10;  → gimbal_set_work_mode(ADJUST_MODE)&#10;否则：&#10;  → gimbal_set_offset(yaw_ecd, pitch_ecd)&#10;  → gimbal_init_start() 进入 INIT_MODE 回中" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-gim" vertex="1">
+                    <mxGeometry x="40" y="55" width="450" height="200" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-gim-pitch" value="ADJUST_MODE — Pitch 标定（约 4 s）&#10;&#10;p_motor = &amp;p_gimbal-&gt;pitch_motor;&#10;t = get_time_ms();&#10;while ( now - t &lt;= 2000 ) {&#10;   motor_set_current(p_motor, +8000);&#10;   pit_ecd_l = ecd; HAL_Delay(2);&#10;}&#10;t = HAL_GetTick();&#10;while ( now - t &lt;= 2000 ) {&#10;   motor_set_current(p_motor, -8000);&#10;   pit_ecd_r = ecd; HAL_Delay(2);&#10;}&#10;// 取均值；若跨越 ±4096 边界则 ±4096 修正" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-gim" vertex="1">
+                    <mxGeometry x="520" y="55" width="380" height="270" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-gim-yaw" value="ADJUST_MODE — Yaw 标定（约 6 s）&#10;&#10;p_motor = &amp;p_gimbal-&gt;yaw_motor;&#10;t = get_time_ms();&#10;while ( now - t &lt;= 3000 ) {&#10;   motor_set_current(p_motor, +6000);&#10;   yaw_ecd_l = ecd; HAL_Delay(2);&#10;}&#10;t = HAL_GetTick();&#10;while ( now - t &lt;= 3000 ) {&#10;   motor_set_current(p_motor, -6000);&#10;   yaw_ecd_r = ecd; HAL_Delay(2);&#10;}&#10;// 同样取均值，含 ±4096 跨界处理" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-gim" vertex="1">
+                    <mxGeometry x="930" y="55" width="380" height="270" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-gim-save" value="持久化 + 复位&#10;&#10;ef_set_env_blob(&#10;  GIMBAL_PARAM_KEY,   // &quot;ECD_CENTER&quot;&#10;  &amp;center_param,&#10;  sizeof(center_param));&#10;&#10;struct gimbal_param {&#10;  uint16_t pitch_ecd_center;&#10;  uint16_t yaw_ecd_center;&#10;};  // 共 4 字节&#10;&#10;__disable_irq();&#10;NVIC_SystemReset();&#10;while(1);" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;fontFamily=Courier New;" parent="cal-lane-gim" vertex="1">
+                    <mxGeometry x="1340" y="55" width="300" height="270" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-gim-init" value="复位后：INIT_MODE 回中（gimbal_init_handle）&#10;&#10;ramp_v0_init(&amp;pitch_ramp, BACK_CENTER_TIME / GIMBAL_PERIOD = 600);&#10;ramp_v0_init(&amp;yaw_ramp,   600);&#10;&#10;循环：&#10;  gimbal_set_pitch_mode = ENCODER_MODE; yaw 同；&#10;  set_pitch_angle = ecd_pitch * (1 - ramp(pitch_ramp));&#10;  if (|ecd_pitch| &lt; 2.0) gimbal_yaw_enable;&#10;       set_yaw_angle = ecd_yaw * (1 - ramp(yaw_ramp));&#10;  if (|ecd_yaw| &lt; 1.2) → gimbal_set_work_mode(NORMAL_MODE);" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F0F0;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-gim" vertex="1">
+                    <mxGeometry x="40" y="350" width="900" height="200" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-gim-use" value="运行时使用（components/modules/gimbal.c）&#10;&#10;ENCODER_ANGLE_RATIO = 8192/360°&#10;&#10;ecd_angle.yaw   = sign · gimbal_get_ecd_angle(raw_ecd, yaw_ecd_center)   / ratio&#10;ecd_angle.pitch = sign · gimbal_get_ecd_angle(raw_ecd, pitch_ecd_center) / ratio&#10;&#10;ANGLE 限制：&#10;  PITCH_ANGLE_MIN/MAX = ±20°&#10;  YAW_ANGLE_MIN/MAX   = ±70°" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F0F0;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-gim" vertex="1">
+                    <mxGeometry x="970" y="350" width="670" height="200" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-gim-e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="cal-lane-gim" source="cal-gim-trig" target="cal-gim-pitch" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+                <mxCell id="cal-gim-e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="cal-lane-gim" source="cal-gim-pitch" target="cal-gim-yaw" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+                <mxCell id="cal-gim-e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;" parent="cal-lane-gim" source="cal-gim-yaw" target="cal-gim-save" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+                <mxCell id="cal-lane-chs" value="④ 底盘标定 — 没有持久化标定，仅有上电编码器零位 + 编译期常量" style="swimlane;horizontal=0;startSize=34;fontSize=13;fillColor=#FFE6CC;strokeColor=#D79B00;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="1750" width="1680" height="370" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-chs-ecd" value="电机编码器零位（每次上电自动取一次，不入 Flash）&#10;&#10;chassis_pid_init() 把 4 个轮子 motor[i].init_offset_f = 1&#10;motor.c::get_encoder_data() 收到第一帧时调用 get_motor_offset()：&#10;   ptr-&gt;ecd        = (rx[0]&lt;&lt;8 | rx[1]);&#10;   ptr-&gt;offset_ecd = ptr-&gt;ecd;     // 作为基准&#10;之后每帧：total_ecd = round_cnt × 8192 + ecd - offset_ecd;&#10;msg_cnt &gt; 50 时 init_offset_f = 0 不再覆写。&#10;&#10;⇒ 不持久化；每次上电由「上电瞬间编码器读数」决定，作里程计零点。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-chs" vertex="1">
+                    <mxGeometry x="40" y="55" width="780" height="290" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-chs-id" value="电机 CAN ID 自动分配（运维操作，不是「标定」）&#10;&#10;chassis_task: RC_S2_DOWN 且 ch1&lt;-400, ch2&lt;-400, ch3&gt;400, ch4&lt;-400 持续 ~2s&#10;→ motor_auto_set_id(DEVICE_CAN2)&#10;→ 发送 0x700 广播帧，由电调进入 ID 分配模式" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-chs" vertex="1">
+                    <mxGeometry x="840" y="55" width="800" height="120" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-chs-no" value="结构 / 几何参数（编译期，无运行时标定）&#10;&#10;详见右侧 ⑤ 默认值表 — 来自 components/algorithm/mecanum.h，&#10;包含轮周长、轴距、轮距、云台-底盘旋转中心偏置 (ROTATE_X/Y_OFFSET)、电机减速比、最大速度等。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-chs" vertex="1">
+                    <mxGeometry x="840" y="195" width="800" height="150" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-lane-def" value="⑤ 默认值与编译期常量（无标定时即生效）" style="swimlane;horizontal=0;startSize=34;fontSize=13;fillColor=#F8CECC;strokeColor=#B85450;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="2140" width="1680" height="240" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-def-imu" value="IMU / AHRS （drv_io.h, drv_bmi088.c）&#10;&#10;DEFAULT_IMU_TEMP = 40.0f °C&#10;gyro_offset[3]  = {0,0,0}（未标定时）&#10;accel_offset[3] = {0,0,0}（始终为 0，无标定）&#10;BMI088 安装矩阵：{{0,1,0},{-1,0,0},{0,0,1}}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-def" vertex="1">
+                    <mxGeometry x="40" y="55" width="500" height="170" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-def-gim" value="云台 （gimbal.h, gimbal_task.c）&#10;&#10;PITCH_ANGLE_MIN/MAX = ±20°&#10;YAW_ANGLE_MIN/MAX   = ±70°&#10;ENCODER_ANGLE_RATIO = 8192/360°&#10;PITCH_MOTOR_POSITIVE_DIR = -1.0f, YAW_= +1.0f&#10;BACK_CENTER_TIME = 3000 ms（INIT 回中 ramp）&#10;无标定时：进入 ADJUST_MODE 自动学习中心" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-def" vertex="1">
+                    <mxGeometry x="560" y="55" width="500" height="170" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-def-chs" value="底盘 （components/algorithm/mecanum.h）&#10;&#10;PERIMETER = 478 mm  RADIUS = 76 mm&#10;Standard：WHEELTRACK 400 / WHEELBASE 376（mm）&#10;ICRA2019 ：WHEELTRACK 394 / WHEELBASE 415（mm）&#10;ROTATE_X_OFFSET = 7 mm   ROTATE_Y_OFFSET = 0 mm&#10;MOTOR_DECELE_RATIO = 1/19   MAX_WHEEL_RPM = 8500&#10;MAX_CHASSIS_VX/VY = 3300 mm/s   MAX_VW = 300 °/s" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;spacingLeft=14;spacingTop=10;verticalAlign=top;" parent="cal-lane-def" vertex="1">
+                    <mxGeometry x="1080" y="55" width="560" height="170" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cal-footer" value="代码索引：application/sensor_task.c · bsp/boards/drv_bmi088.c · bsp/boards/drv_imu.h（BMI088_PARAM_KEY）· application/gimbal/gimbal_task.{c,h}（GIMBAL_PARAM_KEY、ADJUST/INIT/NORMAL）· application/gimbal/gimbal_app.c（USER 键、CMD_GIMBAL_ADJUST）· application/gimbal/gimbal_cmd.c（gimbal_adjust_cmd）· components/modules/gimbal.c（gimbal_set_offset、gimbal_get_ecd_angle）· components/modules/chassis.c（init_offset_f）· components/devices/motor.c（get_motor_offset）· components/algorithm/mecanum.h（几何 / 速度上限）· components/easyflash/{inc/ef_cfg.h, port/ef_port.c, src/ef_env.c}" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#666666;spacingTop=8;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="2400" width="1680" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="hardware-deployment" name="硬件部署与接线">
+        <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1600" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="deploy-title" value="RoboRTS-Firmware — 典型双 MCU 部署（步兵 / 标准机器人类拓扑）" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;fontSize=20;spacingTop=8;spacingBottom=8;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="30" width="1720" height="44" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-sw-robot" value="机器人机体（逻辑边界）" style="swimlane;horizontal=0;startSize=36;fontStyle=1;fontSize=14;fillColor=#F5F5F5;strokeColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="100" width="1720" height="1280" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-gimbal" value="&lt;&lt;执行节点&gt;&gt;&#10;云台控制板（MCU）&#10;&#10;固件：gimbal_app（APP_CONFIG ≠ CHASSIS_APP）&#10;local_addr = GIMBAL_ADDRESS (0x02)&#10;&#10;· CAN1：与底盘板互连（协议封装 + 广播云台信息）&#10;  本板 TX 0x600 / RX 0x500&#10;· CAN2：云台电机（如 0x205/206/207 反馈）&#10;· DBus：接收机 → board.c dr16_uart&#10;· USART1：调试 Shell&#10;· USART6：裁判系统串口（board 配置）&#10;· BMI088：云台 IMU&#10;· USB：可选；未接时上位机指令多经 CAN 转发" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;align=left;verticalAlign=top;spacingLeft=16;spacingTop=12;spacingBottom=12;size=14;" parent="deploy-sw-robot" vertex="1">
+                    <mxGeometry x="80" y="80" width="520" height="360" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-chassis" value="&lt;&lt;执行节点&gt;&gt;&#10;底盘控制板（MCU）&#10;&#10;固件：chassis_app（APP_CONFIG = CHASSIS_APP）&#10;local_addr = CHASSIS_ADDRESS (0x01)&#10;&#10;· CAN1：与云台板互连&#10;  本板 TX 0x500 / RX 0x600&#10;· CAN2：麦克纳姆四轮电机（0x201–204）&#10;· USB VCP：典型接法 — 机载电脑 / 调试（MANIFOLD2 → usb）&#10;· 车体 yaw 广播：CAN1 StdId 0x401（非 protocol 载荷）&#10;· 裁判串口、DBus：与具体 PCB 一致（本工程 board 双板共用外设表）" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=12;align=left;verticalAlign=top;spacingLeft=16;spacingTop=12;spacingBottom=12;size=14;" parent="deploy-sw-robot" vertex="1">
+                    <mxGeometry x="1180" y="80" width="520" height="360" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-can1" value="CAN1 总线&#10;（双板对绞 / 航插）&#10;&#10;应用层协议 +&#10;CMD_PUSH_GIMBAL_INFO 等&#10;&#10;0x401 车体 yaw" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=18;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=12;align=center;verticalAlign=middle;spacingTop=8;spacingBottom=8;" parent="deploy-sw-robot" vertex="1">
+                    <mxGeometry x="760" y="180" width="260" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-pc" value="&lt;&lt;设备&gt;&gt;&#10;机载电脑 / 上位机&#10;(MANIFOLD2_ADDRESS)&#10;&#10;· 典型：USB 接底盘板&#10;· 协议：CMD_SET_CHASSIS_*、&#10;  CMD_PUSH_CHASSIS_INFO、&#10;  裁判转发 cmd+0x4000 等&#10;· 若仅云台 USB：需在云台侧&#10;  增加 CHASSIS 路由扩展" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=12;align=left;verticalAlign=top;spacingLeft=16;spacingTop=12;spacingBottom=12;size=14;" parent="deploy-sw-robot" vertex="1">
+                    <mxGeometry x="1180" y="520" width="520" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-rc" value="&lt;&lt;设备&gt;&gt;&#10;遥控器 + 接收机（DBUS）" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=12;align=center;verticalAlign=middle;size=14;" parent="deploy-sw-robot" vertex="1">
+                    <mxGeometry x="80" y="520" width="280" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-ref" value="&lt;&lt;设备&gt;&gt;&#10;裁判系统模块&#10;（串口至 MCU USART6）" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=12;align=center;verticalAlign=middle;size=14;" parent="deploy-sw-robot" vertex="1">
+                    <mxGeometry x="400" y="520" width="280" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-motor-g" value="云台电机组&#10;CAN2 总线&#10;（C620 等）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#666666;fontSize=12;align=center;verticalAlign=middle;" parent="deploy-sw-robot" vertex="1">
+                    <mxGeometry x="80" y="720" width="240" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-motor-c" value="底盘电机组&#10;CAN2 总线&#10;（四轮）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=#666666;fontSize=12;align=center;verticalAlign=middle;" parent="deploy-sw-robot" vertex="1">
+                    <mxGeometry x="1460" y="720" width="240" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-leg" value="图例与说明" style="swimlane;horizontal=0;startSize=32;fontStyle=1;fontSize=13;fillColor=#FFF4CC;strokeColor=#D6B656;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="1420" width="1720" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-leg-txt" value="· APP_CONFIG（如 PB13）：决定烧录同一二进制后运行 chassis_app 或 gimbal_app，与「接线」无关。&#10;· 逻辑地址 MANIFOLD2 / GIMBAL / CHASSIS 见 infantry_cmd.h；CAN 标准 ID 0x500/0x600 见 protocol_can_interface_register。&#10;· 实际航插、供电、共地以硬件手册为准；本图强调固件视角下的数据路径。" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=12;" parent="deploy-leg" vertex="1">
+                    <mxGeometry x="20" y="48" width="1680" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-e-rc" value="DBUS" style="endArrow=block;html=1;strokeWidth=2;fontSize=11;" parent="deploy-sw-robot" source="deploy-rc" target="deploy-gimbal" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-e-ref" value="USART6" style="endArrow=block;html=1;strokeWidth=2;fontSize=11;dashed=1;" parent="deploy-sw-robot" source="deploy-ref" target="deploy-gimbal" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-e-usb" value="USB" style="endArrow=block;html=1;strokeWidth=2;fontSize=11;" parent="deploy-sw-robot" source="deploy-pc" target="deploy-chassis" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-e-can1a" value="CAN1" style="endArrow=block;html=1;strokeWidth=3;fontSize=11;strokeColor=#1F4788;" parent="deploy-sw-robot" source="deploy-gimbal" target="deploy-can1" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-e-can1b" value="CAN1" style="endArrow=block;html=1;strokeWidth=3;fontSize=11;strokeColor=#1F4788;" parent="deploy-sw-robot" source="deploy-can1" target="deploy-chassis" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-e-c2g" value="CAN2" style="endArrow=block;html=1;strokeWidth=2;fontSize=11;" parent="deploy-sw-robot" source="deploy-motor-g" target="deploy-gimbal" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="deploy-e-c2c" value="CAN2" style="endArrow=block;html=1;strokeWidth=2;fontSize=11;" parent="deploy-sw-robot" source="deploy-motor-c" target="deploy-chassis" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="chassis-speed-flow" name="底盘速度控制链路">
+        <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="2400" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="cs-title" value="底盘速度控制链路（chassis_task · chassis_cmd · mecanum · chassis）" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;fontSize=20;spacingTop=8;spacingBottom=8;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="30" width="1820" height="44" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-sw1" value="① 期望车体速度 vx, vy, vw（谁写入）" style="swimlane;horizontal=0;startSize=36;fontStyle=1;fontSize=14;fillColor=#DAE8FC;strokeColor=#6C8EBF;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="90" width="1820" height="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-rc" value="遥控器分支&#10;application/chassis/chassis_task.c&#10;&#10;周期 ≈ 5 ms（osDelay(5)）&#10;&#10;· RC_S2_UP（随动）&#10;  vx = ch2/660·MAX_CHASSIS_VX_SPEED&#10;  vy = −ch1/660·MAX_CHASSIS_VY_SPEED&#10;  wz = −pid_follow(follow_relative_angle)&#10;  chassis_set_offset(ROTATE_X/Y_OFFSET)&#10;&#10;· RC_S2_MID（全手动）&#10;  vx, vy 同上；wz = −ch3/660·MAX_CHASSIS_VW_SPEED&#10;  offset 置 0&#10;&#10;· RC 过渡档：chassis_set_speed(0,0,0)&#10;&#10;均调用：chassis_set_acc(0,0,0)&#10;      chassis_set_speed(vx, vy, wz)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;fontSize=12;align=left;verticalAlign=top;spacingLeft=16;spacingTop=14;spacingBottom=12;" parent="cs-sw1" vertex="1">
+                    <mxGeometry x="50" y="60" width="860" height="330" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-sdk" value="上位机 / SDK 分支&#10;application/chassis/chassis_cmd.c&#10;&#10;前提：RC_S2_DOWN 且 get_chassis_sdk_mode()==ON&#10;&#10;· chassis_speed_ctrl — CMD_SET_CHASSIS_SPEED&#10;  set_offset(rotate_x/y)&#10;  set_acc(0,0,0)&#10;  set_speed(vx, vy, vw/10)  ← 协议 vw 缩放&#10;&#10;· chassis_spd_acc_ctrl — CMD_SET_CHASSIS_SPD_ACC&#10;  set_offset(...)&#10;  set_acc(ax, ay, wz/10)&#10;  set_speed(vx, vy, vw/10)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;fontSize=12;align=left;verticalAlign=top;spacingLeft=16;spacingTop=14;spacingBottom=12;" parent="cs-sw1" vertex="1">
+                    <mxGeometry x="940" y="60" width="830" height="330" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-sw2" value="② 写入底盘对象（components/modules/chassis.c）" style="swimlane;horizontal=0;startSize=36;fontStyle=1;fontSize=14;fillColor=#E1D5E7;strokeColor=#9673A6;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="540" width="1820" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-set" value="chassis_set_speed(chassis, vx, vy, vw)&#10;→ chassis-&gt;mecanum.speed.{vx, vy, vw}&#10;&#10;chassis_set_acc(ax, ay, wz) → chassis-&gt;acc&#10;（在下一步 PID 周期内可按 dt 积分进 speed）&#10;&#10;chassis_set_offset(x, y) → mecanum.param.rotate_*&#10;（影响麦克纳姆绕偏置旋转中心的四轮分配）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;fontSize=12;align=left;verticalAlign=top;spacingLeft=16;spacingTop=14;spacingBottom=12;" parent="cs-sw2" vertex="1">
+                    <mxGeometry x="50" y="56" width="1720" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-sw3" value="③ 软定时 5 ms：chassis_pid_calculate（chassis.c）" style="swimlane;horizontal=0;startSize=36;fontStyle=1;fontSize=14;fillColor=#FFE6CC;strokeColor=#D79B00;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="770" width="1820" height="520" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-int" value="1）加速度积分（可选）&#10;&#10;speed.vx += acc.ax/1000·Δt&#10;speed.vy += acc.ay/1000·Δt&#10;speed.vw += acc.wz/1000·Δt&#10;&#10;遥控 S2 UP/MID 通常 acc=0，此项不变。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;verticalAlign=top;spacingLeft=14;spacingTop=12;" parent="cs-sw3" vertex="1">
+                    <mxGeometry x="50" y="56" width="540" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-mec" value="2）mecanum_calculate（mecanum.c）&#10;&#10;输入：mecanum.speed + param（来自 mecanum.h）&#10;&#10;· MEC_VAL_LIMIT：|vx|≤MAX_CHASSIS_VX 等&#10;· 逆运动学：vx,vy,vw(mm/s,°/s) → wheel_rpm[0..3]&#10;  几何：WHEELBASE、WHEELTRACK、ROTATE_*、&#10;  PERIMETER、MOTOR_DECELE_RATIO&#10;· 若 max|wheel_rpm| &gt; MAX_WHEEL_RPM：四轮同比缩放" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;verticalAlign=top;spacingLeft=14;spacingTop=12;" parent="cs-sw3" vertex="1">
+                    <mxGeometry x="620" y="56" width="600" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-hdr" value="mecanum.h 常量摘要&#10;&#10;PERIMETER、WHEELTRACK、WHEELBASE&#10;ROTATE_X/Y_OFFSET&#10;MAX_CHASSIS_VX/VY_SPEED (mm/s)&#10;MAX_CHASSIS_VW_SPEED (°/s)&#10;MAX_WHEEL_RPM、MOTOR_DECELE_RATIO" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6E6E6;fontSize=11;align=left;verticalAlign=top;spacingLeft=12;spacingTop=10;" parent="cs-sw3" vertex="1">
+                    <mxGeometry x="1250" y="56" width="520" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-pid" value="3）四轮速度环 PID&#10;&#10;for i in 0..3:&#10;  反馈：motor[i].data.speed_rpm&#10;  目标：mecanum.wheel_rpm[i]&#10;  pid_calculate(motor_pid[i], fb, ref)&#10;  → motor_set_current(motor[i], current)&#10;&#10;PID 参数：chassis_task.c chassis_motor_param&#10;（P/I/D、max_out、integral_limit）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;verticalAlign=top;spacingLeft=14;spacingTop=12;" parent="cs-sw3" vertex="1">
+                    <mxGeometry x="50" y="280" width="860" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-odo" value="4）mecanum_position_measure&#10;&#10;用轮编码器反馈 + 陀螺 yaw&#10;更新里程计（与本图速度环并列执行）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F0F0;fontSize=12;align=left;verticalAlign=top;spacingLeft=14;spacingTop=12;" parent="cs-sw3" vertex="1">
+                    <mxGeometry x="940" y="280" width="830" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-sw4" value="④ 执行层" style="swimlane;horizontal=0;startSize=32;fontStyle=1;fontSize=14;fillColor=#F8CECC;strokeColor=#B85450;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="1320" width="1820" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-can2" value="CAN2 → C620 / 3508 电调（四轮 0x201–0x204）&#10;电流闭环跟踪 mecanum 解算得到的各轮目标转速" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=12;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;" parent="cs-sw4" vertex="1">
+                    <mxGeometry x="50" y="50" width="1720" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-foot" value="注册：chassis_task 内 soft_timer_register(chassis_pid_calculate, &amp;chassis, 5)；chassis_pid_init 绑定 CAN2 与电机名 Chassis_FR/FL/BL/BR。&#10;陀螺：chassis_gyro_updata 在任务循环中更新 mecanum.gyro，供位置推算，不直接替代 chassis_set_speed 的 vx,vy,vw。" style="text;html=1;strokeColor=none;fillColor=#FFFFCC;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=11;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="1490" width="1820" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-e-rc-set" value="set_*" style="endArrow=block;html=1;strokeWidth=2;fontSize=11;" parent="1" source="cs-rc" target="cs-set" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-e-sdk-set" value="set_*" style="endArrow=block;html=1;strokeWidth=2;fontSize=11;" parent="1" source="cs-sdk" target="cs-set" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-e-set-pid" style="endArrow=block;html=1;strokeWidth=2;" parent="1" source="cs-set" target="cs-int" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-e-int-mec" style="endArrow=block;html=1;strokeWidth=2;" parent="1" source="cs-int" target="cs-mec" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-e-mec-pid" style="endArrow=block;html=1;strokeWidth=2;" parent="1" source="cs-mec" target="cs-pid" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cs-e-pid-can" style="endArrow=block;html=1;strokeWidth=2;" parent="1" source="cs-pid" target="cs-can2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
