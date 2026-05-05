@@ -91,7 +91,15 @@ void oled_task(void const *argument)
             ssd1306_show_graphic(0, 1, &battery_box);
             ssd1306_SetCursor(3, 4);
 #ifndef DISABLE_BATTERY_ADC
-            ssd1306_printf(Font_6x8, White, "%3u", (unsigned)get_battery_percentage());
+            {
+                unsigned pct = (unsigned)get_battery_percentage();
+                unsigned vt = (unsigned)(get_battery_voltage_volts() * 10.0f + 0.5f);
+                if (vt > 999U)
+                {
+                    vt = 999U;
+                }
+                ssd1306_printf(Font_6x8, White, "%3u %2u.%uV", pct, vt / 10U, vt % 10U);
+            }
 #else
             ssd1306_printf(Font_6x8, White, "---");
 #endif

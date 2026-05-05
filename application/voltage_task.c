@@ -68,6 +68,11 @@ uint16_t get_battery_percentage(void)
   return (uint16_t)(electricity_percentage * 100.0f);
 }
 
+float get_battery_voltage_volts(void)
+{
+  return battery_voltage;
+}
+
 static osThreadId s_volt_task;
 
 void battery_voltage_task_init(void)
@@ -86,6 +91,11 @@ void battery_voltage_task_init(void)
 uint16_t get_battery_percentage(void)
 {
   return 0;
+}
+
+float get_battery_voltage_volts(void)
+{
+  return 0.0f;
 }
 
 #endif
