@@ -18,6 +18,13 @@
 #define OLED_CONTROL_TIME_MS 10U
 #define OLED_REFRESH_DIV     10U
 
+/* battery_box picture_t width in oledfont.h — keep voltage text to the right of the frame */
+#define OLED_BATTERY_GRAPHIC_W 24U
+#define OLED_BAT_PCT_X         3U
+#define OLED_BAT_PCT_Y         4U
+#define OLED_BAT_VBAT_X        (OLED_BATTERY_GRAPHIC_W + 2U)
+#define OLED_BAT_VBAT_Y        OLED_BAT_PCT_Y
+
 static uint8_t refresh_div;
 
 static offline_event motor_gimbal_offline(uint8_t toe_idx)
@@ -89,7 +96,7 @@ void oled_task(void const *argument)
             ssd1306_Fill(Black);
 
             ssd1306_show_graphic(0, 1, &battery_box);
-            ssd1306_SetCursor(3, 4);
+            ssd1306_SetCursor(OLED_BAT_PCT_X, OLED_BAT_PCT_Y);
 #ifndef DISABLE_BATTERY_ADC
             {
                 unsigned pct = (unsigned)get_battery_percentage();
@@ -98,7 +105,9 @@ void oled_task(void const *argument)
                 {
                     vt = 999U;
                 }
-                ssd1306_printf(Font_6x8, White, "%3u %2u.%uV", pct, vt / 10U, vt % 10U);
+                ssd1306_printf(Font_6x8, White, "%3u", pct);
+                ssd1306_SetCursor(OLED_BAT_VBAT_X, OLED_BAT_VBAT_Y);
+                ssd1306_printf(Font_6x8, White, "%2u.%uV", vt / 10U, vt % 10U);
             }
 #else
             ssd1306_printf(Font_6x8, White, "---");
