@@ -30,6 +30,7 @@
 #include "communicate.h"
 #include "offline_service.h"
 #include "oled_task.h"
+#include "voltage_task.h"
 
 #include "chassis_app.h"
 #include "gimbal_app.h"
@@ -65,6 +66,7 @@ void task_init(void)
 void sys_task(void)
 {
     thread_cli_init();
+    battery_voltage_task_init();
     offline_service_task_init();
     soft_timer_FreeRTOS_init();
     sensor_task_init();

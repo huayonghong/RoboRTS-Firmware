@@ -11,6 +11,7 @@
 #include "ssd1306_fonts.h"
 #include "oledfont.h"
 #include "offline_service.h"
+#include "voltage_task.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -89,7 +90,11 @@ void oled_task(void const *argument)
 
             ssd1306_show_graphic(0, 1, &battery_box);
             ssd1306_SetCursor(3, 4);
+#ifndef DISABLE_BATTERY_ADC
+            ssd1306_printf(Font_6x8, White, "%3u", (unsigned)get_battery_percentage());
+#else
             ssd1306_printf(Font_6x8, White, "---");
+#endif
 
             ssd1306_SetCursor(90, 27);
             ssd1306_printf(Font_6x8, White, "DBUS");

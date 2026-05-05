@@ -30,6 +30,7 @@
 #include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
+#include "adc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -98,6 +99,10 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+#ifndef DISABLE_BATTERY_ADC
+  MX_ADC1_Init();
+  MX_ADC3_Init();
+#endif
   MX_DMA_Init();
   MX_CAN1_Init();
   MX_CAN2_Init();

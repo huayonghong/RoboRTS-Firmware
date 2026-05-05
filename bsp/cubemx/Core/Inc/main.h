@@ -105,7 +105,9 @@ void Error_Handler(void);
 #define CS1_GYRO_Pin GPIO_PIN_0
 #define CS1_GYRO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-
+/* ADC3_IN8 — battery divider (RoboMaster C board, same as 20.standard_robot) */
+#define ADC_BAT_Pin GPIO_PIN_10
+#define ADC_BAT_GPIO_Port GPIOF
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

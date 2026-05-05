@@ -41,6 +41,7 @@ set(INCLUDE_DIRS
 
 set(sdk_sources
     bsp/boards/board.c
+    bsp/boards/bsp_adc.c
     bsp/boards/drv_bmi088.c
     bsp/boards/drv_can.c
     bsp/boards/drv_dr16.c
@@ -50,6 +51,7 @@ set(sdk_sources
     bsp/boards/startup_gcc.s
     bsp/boards/stm32f4xx_it.c
     bsp/boards/usbd_cdc_if.c
+    bsp/cubemx/Core/Src/adc.c
     bsp/cubemx/Core/Src/can.c
     bsp/cubemx/Core/Src/dma.c
     bsp/cubemx/Core/Src/freertos.c
@@ -64,6 +66,8 @@ set(sdk_sources
     bsp/cubemx/Core/Src/tim.c
     bsp/cubemx/Core/Src/usart.c
     bsp/cubemx/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
+    bsp/cubemx/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c
+    bsp/cubemx/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c
     bsp/cubemx/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c
     bsp/cubemx/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
     bsp/cubemx/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
@@ -154,6 +158,7 @@ set(sdk_sources
     application/init.c
     application/offline_service.c
     application/oled_task.c
+    application/voltage_task.c
     application/sensor_task.c
     application/shell.c
     application/chassis/chassis_app.c

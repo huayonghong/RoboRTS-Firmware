@@ -7,6 +7,7 @@
 #define DISABLE_OFFLINE_GIMBAL_TURN_MOTOR 1
 
 /* Define DISABLE_OLED to omit SSD1327 task (I2C2 PF0/PF1). */
+/* Define DISABLE_BATTERY_ADC to omit ADC1/3 init and voltage task (PF10 = ADC3_IN8). */
 
 #endif
 
