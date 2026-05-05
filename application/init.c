@@ -24,10 +24,12 @@
 #include "easyflash.h"
 #include "protocol.h"
 #include "shell.h"
+#include "appcfg.h"
 
 #include "sensor_task.h"
 #include "communicate.h"
 #include "offline_service.h"
+#include "oled_task.h"
 
 #include "chassis_app.h"
 #include "gimbal_app.h"
@@ -55,6 +57,9 @@ void task_init(void)
     }
     app_protocol_init();
     communicate_task_init();
+#ifndef DISABLE_OLED
+    oled_task_init();
+#endif
 }
 
 void sys_task(void)

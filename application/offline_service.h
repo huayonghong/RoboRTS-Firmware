@@ -72,6 +72,8 @@ struct offline_manage_obj
 
 void offline_service_task_init(void);
 
+extern struct offline_manage_obj offline_manage[];
+
 void offline_event_init(struct offline_manage_obj obj);
 void offline_event_time_update(offline_event event);
 void offline_event_enable(offline_event event);
